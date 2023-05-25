@@ -29,10 +29,17 @@ SECRET_KEY = get_secret("SECRET_KEY")
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+        'awe3omereview.link',
+        'localhost',
+        '13.209.249.214']
+STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "static"
 
+MEDIA_URL = "media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 # Application definition
 
@@ -98,7 +105,7 @@ DATABASES = {
         "NAME": get_secret("DB_NAME"),
         "USER": get_secret("DB_USER"),
         "PASSWORD": get_secret("DB_PASSWORD"),
-        "HOST": "localhost",
+        "HOST": "co-mmunity.c44d8vqqywlk.ap-northeast-2.rds.amazonaws.com",
         "PORT": get_secret("DB_PORT")
     }
 }
