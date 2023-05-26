@@ -32,8 +32,9 @@ class MyUser(AbstractBaseUser):
         unique=True,
     )
     
-    profile_image = models.CharField(blank=False, max_length=500)
+    profile_image = models.CharField(blank=True, max_length=500)
     profile_image_url = models.URLField(blank=True, max_length=500)
+    profile_image_image = models.ImageField(blank=True)
     
     followings = models.ManyToManyField("self", symmetrical=False, related_name='followers', blank=True)
 

@@ -1,9 +1,11 @@
 from rest_framework.views import APIView
 from . models import Articles,Comments
-from . serializer import CommentCreateSerializer, ArticleCreateSerializer, ArticleListSerializer, CommentSerializer,ArticleSerializer
+from . serializer import CommentCreateSerializer, ArticleCreateSerializer, ArticleListSerializer, CommentSerializer,ArticleSerializer, ArticleSearchSerializer
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import status, filters, generics
 from rest_framework.generics import get_object_or_404
+from PIL import Image
+
 
 # Create your views here.
 
@@ -66,7 +68,7 @@ class CommentsView(APIView):
 class DetailComments(APIView):
     def patch(self, request, comment_id, article_id):
         comment = get_object_or_404(Comments, id=comment_id)
-        if request.user == comment.auther:
+        if request.user == comment.user:
             serializer = CommentCreateSerializer(comment, data=request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -84,12 +86,21 @@ class DetailComments(APIView):
         else:
             return Response('권한이 없다.', status=status.HTTP_403_FORBIDDEN)
         
-class LikeView(APIView):  #좋아요 기능. 현재 Article모델이 없어서 주석처리
+class LikeView(APIView):
     def post(self, request, article_id):
         article = get_object_or_404(Articles, id=article_id)
+        serializer = ArticleListSerializer(article)
         if request.user in article.likes.all():
             article.likes.remove(request.user)
-            return Response("unlike",status=status.HTTP_204_NO_CONTENT)
+            return Response({"result": "unlike", "count":len(serializer.data['likes'])}, status=status.HTTP_200_OK)
         else:
             article.likes.add(request.user)
-            return Response("like",status=status.HTTP_204_NO_CONTENT)
+            return Response({"result": "like", "count":len(serializer.data['likes'])}, status=status.HTTP_200_OK)
+
+
+class ArticlesSearchView(generics.ListCreateAPIView):
+    search_fields = ["title", "content", "author__email"]
+    filter_backends = (filters.SearchFilter,)
+    
+    queryset = Articles.objects.all()
+    serializer_class = ArticleListSerializer
